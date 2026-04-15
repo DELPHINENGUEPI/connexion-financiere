@@ -1,296 +1,223 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Connexion Financière</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion Financière</title>
 
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Arial", sans-serif;
-      }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
 
-      body {
-        background: linear-gradient(135deg, #0a1f44, #111);
-        color: white;
-        overflow-x: hidden;
-      }
+    body {
+      background: linear-gradient(135deg, #0a1f44, #111);
+      color: white;
+    }
 
-      /* HERO */
-      .hero {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 20px;
-        animation: fadeIn 1s ease-in;
-      }
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
 
-      .hero h1 {
-        font-size: 42px;
-        margin-bottom: 10px;
-      }
+    .cta {
+      margin-top: 20px;
+      padding: 15px 25px;
+      background: #d4af37;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+    }
 
-      .hero p {
-        font-size: 18px;
-        opacity: 0.8;
-        max-width: 600px;
-      }
+    .section {
+      padding: 40px;
+      text-align: center;
+    }
 
-      .cta {
-        margin-top: 30px;
-        padding: 15px 30px;
-        background: #d4af37;
-        border: none;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 8px;
-        transition: 0.3s;
-      }
+    .card {
+      background: white;
+      color: black;
+      padding: 20px;
+      margin: 10px;
+      display: inline-block;
+      border-radius: 10px;
+      cursor: pointer;
+    }
 
-      .cta:hover {
-        transform: scale(1.05);
-      }
+    .form-box {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      display: none;
+    }
 
-      /* SECTION */
-      .section {
-        padding: 60px 20px;
-        max-width: 900px;
-        margin: auto;
-        text-align: center;
-      }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+    }
 
-      .cards {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #d4af37;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 6px;
+    }
 
-      .card {
-        background: white;
-        color: black;
-        padding: 20px;
-        border-radius: 12px;
-        width: 250px;
-        cursor: pointer;
-        transition: 0.3s;
-      }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
 
-      .card:hover {
-        transform: translateY(-5px);
-      }
+<body>
 
-      /* FORM */
-      .form-box {
-        background: white;
-        color: black;
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 500px;
-        margin: auto;
-        display: none;
-      }
+<!-- HERO -->
+<div class="hero">
+  <h1>Connexion Financière</h1>
+  <p>Opportunités financières et emploi au Canada</p>
+  <button class="cta" onclick="start()">Commencer</button>
+</div>
 
-      input,
-      select {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-      }
+<!-- CHOIX -->
+<div class="section hidden" id="choice">
+  <h2>Choisissez votre objectif</h2>
 
-      .btn {
-        width: 100%;
-        padding: 15px;
-        background: #d4af37;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 8px;
-      }
+  <div class="card" onclick="setType('client')">💰 Finances</div>
+  <div class="card" onclick="setType('emploi')">👥 Emploi</div>
+</div>
 
-      /* OTP */
-      .otp {
-        display: none;
-      }
+<!-- FORM -->
+<div class="section">
+  <div class="form-box" id="form">
 
-      /* SUCCESS */
-      .success {
-        display: none;
-        text-align: center;
-        padding: 40px;
-      }
+    <input type="text" id="name" placeholder="Nom complet">
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="phone" placeholder="Téléphone">
 
-      /* ANIMATION */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
+    <select id="gender">
+      <option value="">Sexe</option>
+      <option>Homme</option>
+      <option>Femme</option>
+    </select>
 
-      /* FLOAT EFFECT */
-      .floating {
-        animation: float 3s ease-in-out infinite;
-      }
+    <select id="status">
+      <option>Étudiant</option>
+      <option>Travailleur</option>
+      <option>Résident permanent</option>
+      <option>Citoyen</option>
+    </select>
 
-      @keyframes float {
-        0% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-        100% {
-          transform: translateY(0px);
-        }
-      }
-    </style>
-  </head>
+    <select id="location">
+      <option>Zoom</option>
+      <option>Laval</option>
+    </select>
 
-  <body>
-    <!-- HERO -->
-    <div class="hero">
-      <h1 class="floating">Connexion Financière</h1>
-      <p>
-        Connecter les opportunités. Transformer les finances. Construire ton
-        avenir au Canada 🇨🇦
-      </p>
+    <label>
+      <input type="checkbox" id="consent"> Accepte contact
+    </label>
 
-      <button class="cta" onclick="scrollToSection()">
-        Commencer maintenant
-      </button>
-    </div>
+    <button onclick="submitForm()">Recevoir code</button>
+  </div>
 
-    <!-- CHOIX -->
-    <div class="section" id="start">
-      <h2>Que recherches-tu ?</h2>
+  <!-- OTP -->
+  <div class="form-box hidden" id="otpBox">
+    <input type="text" id="otp" placeholder="Code OTP">
+    <button onclick="verifyOTP()">Valider</button>
+  </div>
 
-      <div class="cards">
-        <div class="card" onclick="selectType('client')">
-          💰 Améliorer mes finances
-        </div>
+  <!-- SUCCESS -->
+  <div class="hidden" id="success">
+    <h2>Merci ✅</h2>
+    <p>Nous vous contacterons bientôt</p>
+  </div>
+</div>
 
-        <div class="card" onclick="selectType('emploi')">
-          👥 Opportunité d’emploi
-        </div>
-      </div>
-    </div>
+<script>
 
-    <!-- FORM -->
-    <div class="section">
-      <div class="form-box" id="formBox">
-        <h2>Tes informations</h2>
+let type = "";
+let emailGlobal = "";
 
-        <input type="text" id="name" placeholder="Nom complet" />
-        <input type="email" id="email" placeholder="Email" />
-        <input type="text" id="phone" placeholder="Téléphone" />
+/* START */
+function start(){
+  document.querySelector(".hero").style.display = "none";
+  document.getElementById("choice").classList.remove("hidden");
+}
 
-        <select id="status">
-          <option>Étudiant</option>
-          <option>Travailleur</option>
-          <option>Résident permanent</option>
-          <option>Autre</option>
-        </select>
+/* TYPE */
+function setType(t){
+  type = t;
+  document.getElementById("form").style.display = "block";
+}
 
-        <select id="location">
-          <option>Zoom</option>
-          <option>Laval</option>
-        </select>
+/* SUBMIT */
+function submitForm(){
 
-        <label>
-          <input type="checkbox" id="consent" />
-          J’accepte d’être contacté par email/SMS
-        </label>
+  const data = {
+    name: name.value,
+    email: email.value,
+    phone: phone.value,
+    gender: gender.value,
+    status: status.value,
+    location: location.value,
+    consent: consent.checked,
+    type: type
+  };
 
-        <button class="btn" onclick="submitForm()">Recevoir mon code</button>
-      </div>
+  if(!data.name || !data.email || !data.phone || !data.gender){
+    alert("Remplis tous les champs");
+    return;
+  }
 
-      <!-- OTP -->
-      <div class="form-box otp" id="otpBox">
-        <h2>Validation</h2>
-        <p>Entre le code reçu par email</p>
+  emailGlobal = data.email;
 
-        <input type="text" id="otp" placeholder="Code OTP" />
+  fetch("https://connexion-financiere.onrender.com/api/prospect", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  })
+  .then(()=>{
+    document.getElementById("form").style.display="none";
+    document.getElementById("otpBox").classList.remove("hidden");
+  })
+  .catch(()=>alert("Erreur"));
+}
 
-        <button class="btn" onclick="verifyOTP()">Vérifier</button>
-      </div>
+/* VERIFY */
+function verifyOTP(){
 
-      <!-- SUCCESS -->
-      <div class="success" id="success">
-        <h2>Merci 🎉</h2>
-        <p>Ta demande est confirmée. On te contactera bientôt.</p>
-      </div>
-    </div>
+  const data = {
+    email: emailGlobal,
+    code: otp.value
+  };
 
-    <script>
-      let type = "";
-      let emailGlobal = "";
+  fetch("https://connexion-financiere.onrender.com/api/verify", {
+    method:"POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  })
+  .then(()=>{
+    document.getElementById("otpBox").style.display="none";
+    document.getElementById("success").classList.remove("hidden");
+  })
+  .catch(()=>alert("Code invalide"));
+}
 
-      /* SCROLL */
-      function scrollToSection() {
-        document.getElementById("start").scrollIntoView({ behavior: "smooth" });
-      }
+</script>
 
-      /* SELECT TYPE */
-      function selectType(t) {
-        type = t;
-        document.getElementById("formBox").style.display = "block";
-        document
-          .getElementById("formBox")
-          .scrollIntoView({ behavior: "smooth" });
-      }
-
-      /* SUBMIT FORM */
-      function submitForm() {
-        const data = {
-          name: document.getElementById("name").value,
-          email: document.getElementById("email").value,
-          phone: document.getElementById("phone").value,
-          status: document.getElementById("status").value,
-          location: document.getElementById("location").value,
-          consent: document.getElementById("consent").checked,
-          type: type,
-        };
-
-        emailGlobal = data.email;
-
-        fetch("http://localhost:8080/api/prospect", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }).then(() => {
-          document.getElementById("formBox").style.display = "none";
-          document.getElementById("otpBox").style.display = "block";
-        });
-      }
-
-      /* VERIFY OTP */
-      function verifyOTP() {
-        const data = {
-          email: emailGlobal,
-          code: document.getElementById("otp").value,
-        };
-fetch("https://TON-BACKEND.onrender.com/api/prospect", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data),
-})
-.then(() => {
-  document.getElementById("formBox").style.display = "none";
-  document.getElementById("otpBox").style.display = "block";
-});
-      }
-    </script>
-  </body>
+</body>
 </html>
