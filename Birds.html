@@ -281,15 +281,15 @@
           email: emailGlobal,
           code: document.getElementById("otp").value,
         };
-
-        fetch("http://localhost:8080/api/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }).then(() => {
-          document.getElementById("otpBox").style.display = "none";
-          document.getElementById("success").style.display = "block";
-        });
+fetch("https://TON-BACKEND.onrender.com/api/prospect", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+})
+.then(() => {
+  document.getElementById("formBox").style.display = "none";
+  document.getElementById("otpBox").style.display = "block";
+});
       }
     </script>
   </body>
