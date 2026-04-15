@@ -87,7 +87,7 @@
 <body>
 
 <!-- HERO -->
-<div class="hero">
+<div class="hero" id="hero">
   <h1>Connexion Financière</h1>
   <p>Opportunités financières et emploi au Canada</p>
   <button class="cta" onclick="start()">Commencer</button>
@@ -116,19 +116,19 @@
     </select>
 
     <select id="status">
-      <option>Étudiant</option>
-      <option>Travailleur</option>
-      <option>Résident permanent</option>
-      <option>Citoyen</option>
+      <option value="Étudiant">Étudiant</option>
+      <option value="Travailleur">Travailleur</option>
+      <option value="Résident permanent">Résident permanent</option>
+      <option value="Citoyen">Citoyen</option>
     </select>
 
     <select id="location">
-      <option>Zoom</option>
-      <option>Laval</option>
+      <option value="Zoom">Zoom</option>
+      <option value="Laval">Laval</option>
     </select>
 
     <label>
-      <input type="checkbox" id="consent"> Accepte contact
+      <input type="checkbox" id="consent"> J'accepte d'être contacté
     </label>
 
     <button onclick="submitForm()">Recevoir code</button>
@@ -136,7 +136,7 @@
 
   <!-- OTP -->
   <div class="form-box hidden" id="otpBox">
-    <input type="text" id="otp" placeholder="Code OTP">
+    <input type="text" id="otp" placeholder="Code OTP reçu">
     <button onclick="verifyOTP()">Valider</button>
   </div>
 
@@ -154,7 +154,7 @@ let emailGlobal = "";
 
 /* START */
 function start(){
-  document.querySelector(".hero").style.display = "none";
+  document.getElementById("hero").style.display = "none";
   document.getElementById("choice").classList.remove("hidden");
 }
 
@@ -162,24 +162,25 @@ function start(){
 function setType(t){
   type = t;
   document.getElementById("form").style.display = "block";
+  document.getElementById("choice").classList.add("hidden");
 }
 
-/* SUBMIT */
+/* SUBMIT FORM */
 function submitForm(){
 
   const data = {
-    name: name.value,
-    email: email.value,
-    phone: phone.value,
-    gender: gender.value,
-    status: status.value,
-    location: location.value,
-    consent: consent.checked,
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    gender: document.getElementById("gender").value,
+    status: document.getElementById("status").value,
+    location: document.getElementById("location").value,
+    consent: document.getElementById("consent").checked,
     type: type
   };
 
   if(!data.name || !data.email || !data.phone || !data.gender){
-    alert("Remplis tous les champs");
+    alert("❌ Remplis tous les champs obligatoires");
     return;
   }
 
@@ -190,19 +191,26 @@ function submitForm(){
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify(data)
   })
-  .then(()=>{
-    document.getElementById("form").style.display="none";
+  .then(async (res) => {
+    if(!res.ok) {
+      throw new Error("Erreur API prospect");
+    }
+
+    document.getElementById("form").style.display = "none";
     document.getElementById("otpBox").classList.remove("hidden");
   })
-  .catch(()=>alert("Erreur"));
+  .catch((err)=>{
+    console.error(err);
+    alert("❌ Erreur envoi formulaire");
+  });
 }
 
-/* VERIFY */
+/* VERIFY OTP */
 function verifyOTP(){
 
   const data = {
     email: emailGlobal,
-    code: otp.value
+    code: document.getElementById("otp").value
   };
 
   fetch("https://connexion-financiere.onrender.com/api/verify", {
@@ -210,11 +218,17 @@ function verifyOTP(){
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify(data)
   })
-  .then(()=>{
-    document.getElementById("otpBox").style.display="none";
+  .then(async (res) => {
+    if(!res.ok){
+      throw new Error("OTP invalide");
+    }
+
+    document.getElementById("otpBox").style.display = "none";
     document.getElementById("success").classList.remove("hidden");
   })
-  .catch(()=>alert("Code invalide"));
+  .catch(()=>{
+    alert("❌ Code OTP invalide");
+  });
 }
 
 </script>
