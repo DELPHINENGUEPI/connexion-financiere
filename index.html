@@ -186,24 +186,21 @@ function submitForm(){
 
   emailGlobal = data.email;
 
-  fetch("https://connexion-financiere.onrender.com/api/prospect", {
+fetch("https://connexion-financiere.onrender.com/api/prospect", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
-  })
-  .then(async (res) => {
-    if(!res.ok) {
-      throw new Error("Erreur API prospect");
+})
+.then(response => response.json()) // Analyse le JSON envoyé par Spring
+.then(result => {
+    if (result.status === "OTP_SENT") {
+        document.getElementById("form").style.display = "none";
+        document.getElementById("otpBox").classList.remove("hidden");
+    } else {
+        alert("Erreur : " + result.status);
     }
-
-    document.getElementById("form").style.display = "none";
-    document.getElementById("otpBox").classList.remove("hidden");
-  })
-  .catch((err)=>{
-    console.error(err);
-    alert("❌ Erreur envoi formulaire");
-  });
-}
+})
+.catch(err => alert("Erreur de connexion au serveur"));
 
 /* VERIFY OTP */
 function verifyOTP(){
