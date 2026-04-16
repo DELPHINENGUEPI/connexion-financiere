@@ -148,112 +148,41 @@
 </div>
 
 <script>
+    const registrationForm = document.querySelector('form'); // Assure-toi d'avoir une balise <form>
 
-let type = "";
-let emailGlobal = "";
+    registrationForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Empêche le rechargement de la page
 
-/* START : Masquer le héros et afficher le choix */
-function start(){
-  document.getElementById("hero").style.display = "none";
-  document.getElementById("choice").classList.remove("hidden");
-}
+        // Récupération des données du formulaire
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
 
-/* TYPE : Définir l'objectif et afficher le formulaire */
-function setType(t){
-  type = t;
-  document.getElementById("choice").classList.add("hidden");
-  document.getElementById("form").style.display = "block";
-}
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
 
-/* SUBMIT FORM : Envoyer les données au backend */
-function submitForm(){
+            const result = await response.json();
 
-  const data = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    gender: document.getElementById("gender").value,
-    status: document.getElementById("status").value,
-    location: document.getElementById("location").value,
-    consent: document.getElementById("consent").checked,
-    type: type
-  };
-
-  // Validation simple
-  if(!data.name || !data.email || !data.phone || !data.gender){
-    alert("❌ Veuillez remplir tous les champs obligatoires.");
-    return;
-  }
-
-  emailGlobal = data.email;
-
-  // Feedback visuel sur le bouton
-  const btn = document.querySelector("#form button");
-  const originalText = btn.innerText;
-  btn.innerText = "Envoi en cours...";
-  btn.disabled = true;
-
-  fetch("https://connexion-financiere.onrender.com/api/prospect", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-  })
-  .then(response => {
-      if (!response.ok) throw new Error("Erreur serveur");
-      return response.json();
-  })
-  .then(result => {
-      if (result.status === "OTP_SENT") {
-          document.getElementById("form").style.display = "none";
-          document.getElementById("otpBox").classList.remove("hidden");
-      } else {
-          alert("Erreur : " + result.status);
-          btn.innerText = originalText;
-          btn.disabled = false;
-      }
-  })
-  .catch(err => {
-      console.error(err);
-      alert("Impossible de contacter le serveur. Vérifiez votre connexion.");
-      btn.innerText = originalText;
-      btn.disabled = false;
-  });
-}
-
-/* VERIFY OTP : Valider le code reçu par email */
-function verifyOTP(){
-  const otpValue = document.getElementById("otp").value;
-
-  if(!otpValue){
-    alert("Entrez le code reçu");
-    return;
-  }
-
-  const data = {
-    email: emailGlobal,
-    code: otpValue
-  };
-
-  fetch("https://connexion-financiere.onrender.com/api/verify", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(async (res) => {
-    const result = await res.json();
-    if(result.status === "VERIFIED"){
-      document.getElementById("otpBox").style.display = "none";
-      document.getElementById("success").classList.remove("hidden");
-    } else {
-      alert("❌ Code OTP invalide ou expiré.");
-    }
-  })
-  .catch((err)=>{
-    console.error(err);
-    alert("❌ Erreur lors de la vérification.");
-  });
-}
+            if (result.status === "SUCCESS") {
+                alert("Félicitations ! " + result.message);
+                // Optionnel : rediriger vers la page de login
+                // window.location.href = "login.html";
+            } else {
+                alert("Erreur : " + result.message);
+            }
+        } catch (error) {
+            console.error("Erreur de connexion au serveur :", error);
+            alert("Le serveur ne répond pas. Vérifie qu'il est bien lancé !");
+        }
+    });
 </script>
-
 </body>
 </html>
