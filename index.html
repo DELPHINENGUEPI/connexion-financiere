@@ -152,20 +152,20 @@
 let type = "";
 let emailGlobal = "";
 
-/* START */
+/* START : Masquer le héros et afficher le choix */
 function start(){
   document.getElementById("hero").style.display = "none";
   document.getElementById("choice").classList.remove("hidden");
 }
 
-/* TYPE */
+/* TYPE : Définir l'objectif et afficher le formulaire */
 function setType(t){
   type = t;
-  document.getElementById("form").style.display = "block";
   document.getElementById("choice").classList.add("hidden");
+  document.getElementById("form").style.display = "block";
 }
 
-/* SUBMIT FORM */
+/* SUBMIT FORM : Envoyer les données au backend */
 function submitForm(){
 
   const data = {
@@ -179,55 +179,80 @@ function submitForm(){
     type: type
   };
 
+  // Validation simple
   if(!data.name || !data.email || !data.phone || !data.gender){
-    alert("❌ Remplis tous les champs obligatoires");
+    alert("❌ Veuillez remplir tous les champs obligatoires.");
     return;
   }
 
   emailGlobal = data.email;
 
-fetch("https://connexion-financiere.onrender.com/api/prospect", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-})
-.then(response => response.json()) // Analyse le JSON envoyé par Spring
-.then(result => {
-    if (result.status === "OTP_SENT") {
-        document.getElementById("form").style.display = "none";
-        document.getElementById("otpBox").classList.remove("hidden");
-    } else {
-        alert("Erreur : " + result.status);
-    }
-})
-.catch(err => alert("Erreur de connexion au serveur"));
+  // Feedback visuel sur le bouton
+  const btn = document.querySelector("#form button");
+  const originalText = btn.innerText;
+  btn.innerText = "Envoi en cours...";
+  btn.disabled = true;
 
-/* VERIFY OTP */
-function verifyOTP(){
-
-  const data = {
-    email: emailGlobal,
-    code: document.getElementById("otp").value
-  };
-
-  fetch("https://connexion-financiere.onrender.com/api/verify", {
-    method:"POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify(data)
+  fetch("https://connexion-financiere.onrender.com/api/prospect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
   })
-  .then(async (res) => {
-    if(!res.ok){
-      throw new Error("OTP invalide");
-    }
-
-    document.getElementById("otpBox").style.display = "none";
-    document.getElementById("success").classList.remove("hidden");
+  .then(response => {
+      if (!response.ok) throw new Error("Erreur serveur");
+      return response.json();
   })
-  .catch(()=>{
-    alert("❌ Code OTP invalide");
+  .then(result => {
+      if (result.status === "OTP_SENT") {
+          document.getElementById("form").style.display = "none";
+          document.getElementById("otpBox").classList.remove("hidden");
+      } else {
+          alert("Erreur : " + result.status);
+          btn.innerText = originalText;
+          btn.disabled = false;
+      }
+  })
+  .catch(err => {
+      console.error(err);
+      alert("Impossible de contacter le serveur. Vérifiez votre connexion.");
+      btn.innerText = originalText;
+      btn.disabled = false;
   });
 }
 
+/* VERIFY OTP : Valider le code reçu par email */
+function verifyOTP(){
+  const otpValue = document.getElementById("otp").value;
+
+  if(!otpValue){
+    alert("Entrez le code reçu");
+    return;
+  }
+
+  const data = {
+    email: emailGlobal,
+    code: otpValue
+  };
+
+  fetch("https://connexion-financiere.onrender.com/api/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(async (res) => {
+    const result = await res.json();
+    if(result.status === "VERIFIED"){
+      document.getElementById("otpBox").style.display = "none";
+      document.getElementById("success").classList.remove("hidden");
+    } else {
+      alert("❌ Code OTP invalide ou expiré.");
+    }
+  })
+  .catch((err)=>{
+    console.error(err);
+    alert("❌ Erreur lors de la vérification.");
+  });
+}
 </script>
 
 </body>
